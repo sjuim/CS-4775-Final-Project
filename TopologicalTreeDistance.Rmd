@@ -1,0 +1,90 @@
+---
+title: "Topological Tree Distance"
+output: html_document
+date: "2023-12-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Topological Tree Distance using library apes
+
+**Step 1:** Insert library
+
+```{r}
+library(ape)
+```
+
+**Step 2:** Read trees from .nwk/.newick formats into document as objects of type "phylo"
+
+```{r}
+rocky <- read.tree(text = "((A:1, B:1):2, ((C:1, D:1):2, (E:1, F:1):2):4);")
+plot(rocky)
+```
+
+```{r}
+arabella <- read.tree(text = "((C:1, D:1):2, ((B:1, A:1):2, (E:1, F:1):2):4);")
+plot(arabella)
+```
+
+```{r}
+minnie <- read.tree(text = "((A:1, B:1):2, ((E:1, F:1):2, (C:1, D:1):2):4);")
+plot(minnie)
+```
+
+```{r}
+#read from file example, will return NULL is file is not formatted according to the specifications
+filename <- "NewickExample.nwk"
+barbarella <- read.tree(filename)
+barbarella
+```
+
+```{r}
+plot(barbarella)
+```
+
+```{r}
+gorilla <- read.tree(text = "((A:2, B:2):4, ((C:2, D:2):4, (E:2, F:2):4):8);")
+plot(gorilla)
+```
+
+**Step 3:** Calculate the topological distance between pairs of trees. The method, dist.topo, offers two different topological distance calculations.
+
+**Method 1: Robinson and Foulds/Penny and Hendy**
+
+In this method, the topological distance is calculated as 2 times the number of internal branches defining different bipartitions of the tips.
+
+**Method 2: Branch length score (Kuhner and Felsenstein)**
+
+In this method, the topological distance is calculated as the square root of the sum of the squared differences of the internal branch lengths defining similar bipartitions in both trees. Main difference is that this method takes branch lengths into account.
+
+```{r}
+#Method 1 on rocky and gorilla
+dist.topo(rocky, gorilla, method = "PH85")
+```
+
+```{r}
+#Method 2 on rocky and gorilla
+dist.topo(rocky, gorilla, method = "score")
+```
+
+```{r}
+#Method 1 on rocky and arabella
+dist.topo(rocky, arabella, method = "PH85")
+```
+
+```{r}
+#Method 2 on rocky and arabella
+dist.topo(rocky, arabella, method = "score")
+```
+
+```{r}
+#Method 1 on rocky and minnie
+dist.topo(rocky, minnie, method = "PH85")
+```
+
+```{r}
+#Method 2 on rocky and minnie
+dist.topo(rocky, minnie, method = "score")
+```
