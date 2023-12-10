@@ -13,7 +13,19 @@ knitr::opts_chunk$set(echo = TRUE)
 **Step 1:** Insert library
 
 ```{r}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+install.packages("treeio")
+```
+
+```{r}
+install("treeio")
+```
+
+```{r}
 library(ape)
+library(treeio)
 ```
 
 **Step 2:** Read trees from .nwk/.newick formats into document as objects of type "phylo"
@@ -87,4 +99,164 @@ dist.topo(rocky, minnie, method = "PH85")
 ```{r}
 #Method 2 on rocky and minnie
 dist.topo(rocky, minnie, method = "score")
+```
+
+# **Import all trees**
+
+The Bayesian MCMC tree is provided in nexus format.
+
+The method read.nexus may produce an object of type "phylo" or "multiPhylo," so we are checking to make sure that a "phylo" object as being created (i.e., only one tree is being read).
+
+```{r}
+mcmc_tree_bad_tips <- read.nexus("BayesianMCMC.nexus")
+class(mcmc_tree_bad_tips)
+```
+
+Confirm the tree has been correctly read by plotting it. Note how the tips contain labels with redundant information.
+
+```{r}
+plot(mcmc_tree_bad_tips)
+```
+
+Update tree tip labels to allow for analysis on the Bayesian MCMC tree.
+
+```{r}
+#step 1: generate new, desired tip names from old
+mcmc_new_tips <- vector(mode='character',length=21)
+for(i in 1:21)
+{
+  mcmc_new_tips[i] <- paste(substring(mcmc_tree_bad_tips$tip.label[i], 1, 9), substring(mcmc_tree_bad_tips$tip.label[i], 57, 66), sep = "")
+}
+mcmc_new_tips
+```
+
+```{r}
+d <- data.frame(mcmc_tree_bad_tips$tip.label, mcmc_new_tips)
+mcmc_tree <- rename_taxa(mcmc_tree_bad_tips, d)
+plot(mcmc_tree)
+```
+
+The UPGMA, Neighbor-Joining, Parsimony, and MLE trees are provided in newick format.
+
+```{r}
+upgma_tree <- read.tree("UPGMATree.nwk")
+neighbor_joining_tree <- read.tree("NJTree.nwk")
+parsimony_tree <- read.tree("parsimony.nwk")
+mle_tree <- read.tree("MLE.nwk")
+```
+
+Once again confirm that each tree is correctly read by plotting it to check for tip labels.
+
+```{r}
+plot(upgma_tree)
+```
+
+```{r}
+plot(neighbor_joining_tree)
+```
+
+```{r}
+plot(parsimony_tree)
+```
+
+```{r}
+plot(mle_tree)
+```
+
+This analysis requires the use of unrooted trees, so we will make sure that all trees are unrooted before running the analysis.
+
+```{r}
+is.rooted(mcmc_tree)
+mcmc_tree <- unroot(mcmc_tree)
+is.rooted(mcmc_tree)
+```
+
+```{r}
+is.rooted(upgma_tree)
+upgma_tree <- unroot(upgma_tree)
+is.rooted(upgma_tree)
+```
+
+```{r}
+is.rooted(neighbor_joining_tree)
+neighbor_joining_tree <- unroot(neighbor_joining_tree)
+is.rooted(neighbor_joining_tree)
+```
+
+```{r}
+is.rooted(parsimony_tree)
+parsimony_tree <- unroot(parsimony_tree)
+is.rooted(parsimony_tree)
+```
+
+```{r}
+is.rooted(mle_tree)
+```
+
+# Topological Distances Calculations
+
+Define function to call topological distance calculations on each pair of trees.
+
+```{r}
+trees <- c(mcmc_tree, upgma_tree, neighbor_joining_tree, parsimony_tree, mle_tree)
+
+calculate_topo_dists <- function(tree, calc_method){
+  output <- c(1,1,1,1,1)
+  index = 1
+  for (cmp_tree in trees)
+  {
+    output[index] = dist.topo(tree, cmp_tree, method = calc_method)
+    index = index + 1
+  }
+  return(output)
+}
+```
+
+Calculate all pairs of topological distances.
+
+```{r}
+topo_dists_table <- function(calc_method) {
+  mcmc_topo_dists <- calculate_topo_dists(mcmc_tree, calc_method)
+  upgma_topo_dists <- calculate_topo_dists(upgma_tree, calc_method)
+  neighbor_joining_topo_dists <- calculate_topo_dists(neighbor_joining_tree, calc_method)
+  parsimony_dists <- calculate_topo_dists(parsimony_tree, calc_method)
+  mle_topo_dists <- calculate_topo_dists(mle_tree, calc_method)
+  
+  #topo_dists_vector <- c(mcmc_topo_dists, upgma_topo_dists, neighbor_joining_topo_dists, parsimony_dists, mle_topo_dists)
+  #topo_dists = matrix(topo_dists_vector, nrow = 5, ncol = 5)
+  topo_dists = data.frame(Methods = c("Bayesian_MCMC", "UPGMA", "NJ", "Parsimony", "MLE"),
+    Bayesian_MCMC = mcmc_topo_dists,
+                          UPGMA = upgma_topo_dists,
+                          NJ = neighbor_joining_topo_dists,
+                          Parsimony = parsimony_dists,
+                          MLE = mle_topo_dists, row.names = 1)
+  return(topo_dists)
+}
+```
+
+Place all topological distances in a 2 x 2 vector.
+
+```{r}
+topo_dists_RF <- topo_dists_table("PH85")
+topo_dists_branch_length_score <- topo_dists_table("score")
+```
+
+Pretty print all topological distances
+
+```{r}
+topo_dists_RF
+```
+
+```{r}
+topo_dists_branch_length_score
+```
+
+Finally, write these outputs to csv files.
+
+```{r}
+write.csv(topo_dists_RF, "RobinsonFouldsTopologicalDistances.csv", row.names=TRUE)
+```
+
+```{r}
+write.csv(topo_dists_branch_length_score, "BranchLengthScoreTopologicalDistances.csv", row.names=TRUE)
 ```

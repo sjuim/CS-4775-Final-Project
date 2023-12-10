@@ -1,0 +1,6 @@
+"","Bayesian_MCMC","UPGMA","NJ","Parsimony","MLE"
+"Bayesian_MCMC",0,20,18,18,22
+"UPGMA",20,0,10,14,28
+"NJ",18,10,0,8,28
+"Parsimony",18,14,8,0,26
+"MLE",22,28,28,26,0
