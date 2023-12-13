@@ -1,0 +1,32 @@
+How to Reproduce our Results:
+1. Download Data in the form of fasta files from https://www.ncbi.nlm.nih.gov/genomes/VirusVariation/Database/nph-select.cgi?taxid=186536 with the following settings to get congo_nucleoproteins.fa:
+    Sequence Type: Protein
+    Species: Any
+    Host: Human
+    Region/Country: Democratic Repulic of the Congo
+    Genome Region: Nucleoprotein
+    Isolation Source: Any
+
+2. Clean data using cleanData.ipynb in order to ensure sequences are all the 
+same length. The output will be congo_nucleoproteins_padded.fasta. Also, we
+shortened the labels for sequences by leaving only the ID and date and removing
+'|Homo sapiens|Democratic Republic of the Congo'. The file with shortened labels
+is congo_nucleotide_fix_names.fasta.
+
+3. In order to produce our figures and results for the Parsimony method, one can
+run parsimony.ipynb and obtain the parsimony.nwk and Parsimony_tree.png outputs.
+
+4. To produce our results for the UPGMA method, run biopython.ipynb. To produce 
+our results for the neighbor joining method, run biopython.ipynb using the neighbor 
+joining method DistanceTreeConstructor instead of UPGMA. This is how one can obtain
+our NJTree.nwk file and UPGMATree.nwk file as well as UPGMATREE.png.
+
+5. To produce our results for maximum likelihood, run the topiary.ipynb file. Thus,
+one can obtain the topiary.png output.
+
+6. To produce our results for the Bayesian method, use the BayesianMCMC.nexus file.
+
+7. Our analysis with RF Topological Distances can be reproduced via the
+TopologicalTreeDistance.Rmd file.
+
+
