@@ -25,7 +25,7 @@ our NJTree.nwk file and UPGMATree.nwk file as well as UPGMATREE.png.
 one can obtain the topiary.png output.
 
 6. To produce our results for the Bayesian method, convert the data to a .nexus file
-using MEGA and then use the resulting file to BEAUTi to generate a BEAST .xml file. 
+using MEGA and then open the resulting file in BEAUTi to generate a BEAST .xml file. 
 Open the .xml file in BEAST and run the program for a total chain length of 10000000 
 using a strict molecular clock model to obtain the the BayesianMCMC.nexus file output.
 
