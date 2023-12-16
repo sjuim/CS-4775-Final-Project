@@ -24,7 +24,10 @@ our NJTree.nwk file and UPGMATree.nwk file as well as UPGMATREE.png.
 5. To produce our results for maximum likelihood, run the topiary.ipynb file. Thus,
 one can obtain the topiary.png output.
 
-6. To produce our results for the Bayesian method, use the BayesianMCMC.nexus file.
+6. To produce our results for the Bayesian method, convert the data to a .nexus file
+using MEGA and then use the resulting file to BEAUTi to generate a BEAST .xml file. 
+Open the .xml file in BEAST and run the program for a total chain length of 10000000 
+using a strict molecular clock model to obtain the the BayesianMCMC.nexus file output.
 
 7. Our analysis with RF Topological Distances can be reproduced via the
 TopologicalTreeDistance.Rmd file.
